@@ -2,14 +2,15 @@
 
 IN=main.c
 VEX=vex
-CFLAGS=-Os -ansi
+CFLAGS=-Os -ansi -Wall
+LDFLAGS=-lcurses
 CC=cc
 
 build:
-	$(CC) $(IN) $(CFLAGS) -o $(VEX)
+	$(CC) $(IN) $(CFLAGS) $(LDFLAGS) -o $(VEX)
 
 clean:
-	rm *.o $(VEX)
+	rm $(VEX)
 
 install: build
 	mkdir $(PREFIX)
