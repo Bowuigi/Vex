@@ -46,7 +46,7 @@ void ui(char options[PATH_MAX][MAX_OPTIONS], char fprop[PATH_MAX][MAX_OPTIONS]) 
 
 		if (c==KEY_UP && cy>2)
 			cy--;
-		if (c==KEY_DOWN && cy<maxopt-1)
+		if (c==KEY_DOWN && cy<maxopt)
 			cy++;
 
 		if ((int)cy>=(LINES-2)+(int)sy && sy<maxopt)
