@@ -80,7 +80,6 @@ int main(int argc, char **arg) {
  * https://codeforwin.org/2018/03/c-program-find-file-properties-using-stat-function.html
 */
 char *getFileProperties(struct stat stats) {
-	struct tm dt;
 	char str[MAX_OPTIONS]="";
 	static char tmp[MAX_OPTIONS]="";
 
@@ -133,13 +132,6 @@ char *getFileProperties(struct stat stats) {
 		sprintf(tmp,"%lldB",stats.st_size);
 		strcat(str, tmp);
 	}
-
-	strcat(str," ");
-
-	/* File modification time */
-	dt = *(gmtime(&stats.st_mtime));
-	sprintf(tmp,"mod: %d-%d-%d %d:%d:%d", dt.tm_year, dt.tm_mon, dt.tm_mday + 1900, dt.tm_hour, dt.tm_min, dt.tm_sec);
-	strcat(str,tmp);
 
 	strcat(str," ");
 

@@ -52,7 +52,7 @@ void ui(char options[PATH_MAX][MAX_OPTIONS], char fprop[PATH_MAX][MAX_OPTIONS]) 
 		if ((int)cy>=(LINES-2)+(int)sy && sy<maxopt)
 			sy++;
 
-		if ((int)cy<=(int)sy && sy>1)
+		if ((int)cy<=(int)sy && sy>2)
 			sy--;
 
 		/* Draw */
@@ -63,9 +63,9 @@ void ui(char options[PATH_MAX][MAX_OPTIONS], char fprop[PATH_MAX][MAX_OPTIONS]) 
 
 		int i=1;
 		for (i=1;i<LINES-1;i++) {
-			if (options[i+sy]==NULL) {
+			if (options[i+sy]==NULL || strcmp(options[i+sy],"")) {
 				maxopt=i+sy;
-				break;
+				/*break;*/
 			}
 			if ((i+sy)==cy)
 				attron(A_REVERSE);
