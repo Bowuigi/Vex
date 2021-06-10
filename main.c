@@ -58,7 +58,6 @@ int main(int argc, char **arg) {
 			if (stat(path,&stats)==0) {
 				strcpy(fprop[i],getFileProperties(stats));
 				strcpy(opt[i],name);
-				printf("%s\n",fprop[i]);
 			} else {
 				if (errno==0) {
 					errno=13; /* Default to permission denied */
@@ -103,7 +102,9 @@ char *getFileProperties(struct stat stats) {
 	strcat(str," ");
 
 	/* File type */
-	if        (S_ISBLK(stats.st_mode)) {
+	if        (S_ISLNK(stats.st_mode)) {
+		strcat(str,"symlink");
+	} else if (S_ISBLK(stats.st_mode)) {
 		strcat(str,"block");
 	} else if (S_ISCHR(stats.st_mode)) {
 		strcat(str,"character");
@@ -113,8 +114,6 @@ char *getFileProperties(struct stat stats) {
 		strcat(str,"file");
 	} else if (S_ISDIR(stats.st_mode)) {
 		strcat(str,"directory");
-	} else if (S_ISLNK(stats.st_mode)) {
-		strcat(str,"symlink");
 	}
 
 	strcat(str," ");

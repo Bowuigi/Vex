@@ -4,6 +4,25 @@
 
 #define MAX_OPTIONS 1024
 #define LEN(arr) sizeof(arr)-sizeof(arr[0])
+#define MAX_WIN_WIDTH COLS-1
+
+char *strtrun(char *str, int length) {
+	static char tmp[PATH_MAX];
+	strncpy(tmp,str,length);
+	return tmp;
+}
+
+char *strfill(char *str, char fill, int finallength) {
+	static char tmp[PATH_MAX];
+	strcpy(tmp,str);
+	int len=strlen(str);
+	int f=len;
+	for (f=len;f<finallength;f++) {
+		tmp[f]=fill;
+	}
+	tmp[finallength]='\0';
+	return tmp;
+}
 
 void ui(char options[PATH_MAX][MAX_OPTIONS], char fprop[PATH_MAX][MAX_OPTIONS]) {
 	int c='a';
@@ -44,38 +63,61 @@ void ui(char options[PATH_MAX][MAX_OPTIONS], char fprop[PATH_MAX][MAX_OPTIONS]) 
 		/* Update */
 		c=getch();
 
-		if (c==KEY_UP && cy>2)
+		if ((c==KEY_UP || c=='k') && cy>2)
 			cy--;
-		if (c==KEY_DOWN && cy<maxopt)
+		if ((c==KEY_DOWN || c=='j') && cy<maxopt)
 			cy++;
+
+		if (c==KEY_RIGHT || c=='l') {
+			break;
+		}
 
 		if ((int)cy>=(LINES-2)+(int)sy && sy<maxopt)
 			sy++;
 
-		if ((int)cy<=(int)sy && sy>2)
+		if ((int)cy<=(int)sy+1 && sy>1)
 			sy--;
 
 		/* Draw */
 		clear();
-		attron(COLOR_PAIR(COLOR_BLUE));
-
-		mvvline(1,COLS/2,0,LINES-2);
 
 		int i=1;
 		for (i=1;i<LINES-1;i++) {
 			if (options[i+sy]==NULL || strcmp(options[i+sy],"")) {
 				maxopt=i+sy;
-				/*break;*/
 			}
+
+			/* Color Handling */
+
+			/* Executables */
+			if (strstr(fprop[i+sy],"x"))
+				attron(COLOR_PAIR(COLOR_GREEN));
+
+			/* Directories */
+			if ((strstr(fprop[i+sy],"directory"))!=NULL)
+				attron(COLOR_PAIR(COLOR_BLUE));
+
+			/*--------------------------*/
+
 			if ((i+sy)==cy)
 				attron(A_REVERSE);
-			mvprintw(i,1,"%s",options[i+sy]);
+			mvprintw(i,1,"%s",strtrun(strfill(options[i+sy],' ',MAX_WIN_WIDTH),MAX_WIN_WIDTH));
 			if ((i+sy)==cy)
 				attroff(A_REVERSE);
+
+			/* Disable color*/
+			if (strstr(fprop[i+sy],"x"))
+				attroff(COLOR_PAIR(COLOR_GREEN));
+
+			if ((strstr(fprop[i+sy],"directory"))!=NULL)
+				attroff(COLOR_PAIR(COLOR_BLUE));
+
+			/*----------------------------*/
+
 		}
 
 		mvprintw(LINES-1,0,"%s",fprop[cy]);
-		attroff(COLOR_PAIR(COLOR_BLUE));
+
 		refresh();
 		/* End */
 	}

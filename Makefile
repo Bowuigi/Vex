@@ -5,9 +5,11 @@ VEX=vex
 CFLAGS=-Os -ansi -Wall
 LDFLAGS=-lcurses
 CC=cc
+STRIP=strip
 
 build:
 	$(CC) $(IN) $(CFLAGS) $(LDFLAGS) -o $(VEX)
+#	$(STRIP) $(VEX)
 
 clean:
 	rm $(VEX)
