@@ -68,7 +68,7 @@ void ui(char options[PATH_MAX][MAX_OPTIONS], char fprop[PATH_MAX][MAX_OPTIONS]) 
 		if ((c==KEY_DOWN || c=='j') && cy<maxopt)
 			cy++;
 
-		if (c==KEY_RIGHT || c=='l') {
+		if (c==KEY_RIGHT || c=='l' || c==KEY_ENTER) {
 			break;
 		}
 
@@ -116,7 +116,9 @@ void ui(char options[PATH_MAX][MAX_OPTIONS], char fprop[PATH_MAX][MAX_OPTIONS]) 
 
 		}
 
-		mvprintw(LINES-1,0,"%s",fprop[cy]);
+		attron(A_STANDOUT);
+		mvprintw(LINES-1,0," Vex | %s",strtrun(strfill(fprop[cy],' ',MAX_WIN_WIDTH),MAX_WIN_WIDTH));
+		attroff(A_STANDOUT);
 
 		refresh();
 		/* End */

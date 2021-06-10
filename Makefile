@@ -9,7 +9,7 @@ STRIP=strip
 
 build:
 	$(CC) $(IN) $(CFLAGS) $(LDFLAGS) -o $(VEX)
-#	$(STRIP) $(VEX)
+	$(STRIP) $(VEX)
 
 clean:
 	rm $(VEX)
