@@ -1,141 +1,147 @@
-/*
- * Vex, a file manager inspired by NetRW in Vim
- * By Bowuigi
- * Licensed under the GNU GPLv3
-*/
-
+#include <ncurses.h>
 #include <stdio.h>
-#include <dirent.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <time.h>
-#include <unistd.h>
 #include <linux/limits.h>
-#include "ui.h"
+#include <string.h>
+#include "config.h"
+#include "file.h"
 
-/* Define byte sizes */
-#define KB 1000
-#define MB 1000*KB
-#define GB 1000*MB
+char *strtrun(char *str, int length) {
+	static char tmp[PATH_MAX];
+	strncpy(tmp,str,length);
+	return tmp;
+}
 
-char *getFileProperties(struct stat stats);
+char *strfill(char *str, char fill, int finallength) {
+	static char tmp[PATH_MAX];
+	strcpy(tmp,str);
+	int len=strlen(str);
+	int f=len;
+	for (f=len;f<finallength;f++) {
+		tmp[f]=fill;
+	}
+	tmp[finallength]='\0';
+	return tmp;
+}
 
 int main(int argc, char **arg) {
+	dir_info files;
+
+	int c='a';
 	char directory[PATH_MAX];
 	if (argc>1) {
 		strcpy(directory,arg[1]);
 	} else {
 		strcpy(directory,".");
 	}
-	strcat(directory,"/");
-	struct dirent *de;  /* Pointer for directory entry */
-	DIR *dir = opendir(directory);
-	errno=0;
 
-	if (dir == NULL) {
-		if (errno==0) {
-			errno=13; /* Default to permission denied */
-		}
-		printf("%s\n",strerror(errno));
-		return 1;
+	files=ls(directory);
+
+	/* Start Curses */
+	WINDOW *w;
+	w = initscr();
+
+	if (w==NULL) {
+		printf("Failed starting Curses");
 	}
-	int i=0;
-	static char opt[PATH_MAX][MAX_OPTIONS];
-	static char fprop[PATH_MAX][MAX_OPTIONS];
 
-	while ((de = readdir(dir)) != NULL) {
-		i++;
-		static struct stat stats; /* Struct holding the stats of a file */
-		char name[256]="";
-		memcpy(name,de->d_name,sizeof(de->d_name));
-		char path[PATH_MAX+256];
-		strcpy(path,directory);
-		strcat(path,name);
-		if (strcmp(name,".")) {
-			errno=0;
-			if (stat(path,&stats)==0) {
-				strcpy(fprop[i],getFileProperties(stats));
-				strcpy(opt[i],name);
-			} else {
-				if (errno==0) {
-					errno=13; /* Default to permission denied */
-				}
-				printf("%s: %s\n",name,strerror(errno));
+	/* Curses settings */
+	noecho();
+	cbreak();
+	keypad(w,TRUE);
+	halfdelay(3);
+	curs_set(0); /* hide cursor */
+
+	/* Init colors */
+	if (has_colors()) {
+		start_color();
+		init_pair(COLOR_BLACK,   COLOR_BLACK,   COLOR_BLACK);
+		init_pair(COLOR_GREEN,   COLOR_GREEN,   COLOR_BLACK);
+		init_pair(COLOR_RED,     COLOR_RED,     COLOR_BLACK);
+		init_pair(COLOR_CYAN,    COLOR_CYAN,    COLOR_BLACK);
+		init_pair(COLOR_WHITE,   COLOR_WHITE,   COLOR_BLACK);
+		init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
+		init_pair(COLOR_BLUE,    COLOR_BLUE,    COLOR_BLACK);
+		init_pair(COLOR_YELLOW,  COLOR_YELLOW,  COLOR_BLACK);
+	}
+
+	unsigned int sy=1;
+	unsigned int cy=2;
+	unsigned int maxopt=MAX_OPTIONS;
+
+	while (c!='q') {
+		/* Update */
+		c=getch();
+
+		if ((c==KEY_UP || c=='k') && cy>2)
+			cy--;
+		if ((c==KEY_DOWN || c=='j') && cy<maxopt)
+			cy++;
+
+		if (c==KEY_RIGHT || c=='l') {
+			break;
+		}
+
+		if ((int)cy>=(LINES-2)+(int)sy && sy<maxopt)
+			sy++;
+
+		if ((int)cy<=(int)sy+1 && sy>1)
+			sy--;
+
+		/* Draw */
+		clear();
+
+		int i=1;
+		for (i=1;i<LINES-1;i++) {
+			if (files.options[i+sy]==NULL || strcmp(files.options[i+sy],"")) {
+				maxopt=i+sy;
 			}
+
+			/* Color Handling */
+
+			/* Executables */
+			if (strstr(files.fprop[i+sy],"x"))
+				attron(COLOR_PAIR(COLOR_GREEN));
+
+			/* Directories */
+			if ((strstr(files.fprop[i+sy],"directory"))!=NULL)
+				attron(COLOR_PAIR(COLOR_BLUE));
+
+			/*--------------------------*/
+
+			if ((i+sy)==cy)
+				attron(A_REVERSE);
+
+			mvprintw(i,1,"%s",strtrun(strfill(files.options[i+sy],' ',COLS-1),COLS-1));
+
+/*			if ((i+sy)==cy) */
+			attroff(A_REVERSE);
+
+			/* Disable color*/
+			if (strstr(files.fprop[i+sy],"x"))
+				attroff(COLOR_PAIR(COLOR_GREEN));
+
+			if ((strstr(files.fprop[i+sy],"directory"))!=NULL)
+				attroff(COLOR_PAIR(COLOR_BLUE));
+
+			/*----------------------------*/
+
 		}
+
+		attron(A_STANDOUT);
+		mvprintw(LINES-1,0," Vex | %s",strtrun(strfill(files.fprop[cy],' ',COLS/2),COLS/2));
+		attroff(A_STANDOUT);
+
+		refresh();
+		/* End */
 	}
 
-	closedir(dir);
+	/* Revert settings */
+	curs_set(1);/* show cursor */
+	keypad(w,FALSE);
+	nocbreak();
+	echo();
 
-	/*-----------------------------*/
-	/*ui(opt,disp);*/
-	ui(opt,fprop);
-}
-
-/*
- * Heavily modified version of
- * https://codeforwin.org/2018/03/c-program-find-file-properties-using-stat-function.html
-*/
-char *getFileProperties(struct stat stats) {
-	char str[MAX_OPTIONS]="";
-	static char tmp[MAX_OPTIONS]="";
-
-	/* File permissions */
-	if (stats.st_mode & S_IRUSR) {
-		strcat(str,"r");
-	} else {
-		strcat(str,"-");
-	}
-	if (stats.st_mode & S_IWUSR) {
-		strcat(str,"w");
-	} else {
-		strcat(str,"-");
-	}
-	if (stats.st_mode & S_IXUSR) {
-		strcat(str,"x");
-	} else {
-		strcat(str,"-");
-	}
-
-	strcat(str," ");
-
-	/* File type */
-	if        (S_ISLNK(stats.st_mode)) {
-		strcat(str,"symlink");
-	} else if (S_ISBLK(stats.st_mode)) {
-		strcat(str,"block");
-	} else if (S_ISCHR(stats.st_mode)) {
-		strcat(str,"character");
-	} else if (S_ISFIFO(stats.st_mode)) {
-		strcat(str,"FIFO");
-	} else if (S_ISREG(stats.st_mode)) {
-		strcat(str,"file");
-	} else if (S_ISDIR(stats.st_mode)) {
-		strcat(str,"directory");
-	}
-
-	strcat(str," ");
-	/* Human readable file size */
-	if (stats.st_size>=GB) {
-		sprintf(tmp,"%lldGB",stats.st_size/GB);
-		strcat(str,tmp);
-	} else if (stats.st_size>=MB) {
-		sprintf(tmp,"%lldMB",stats.st_size/MB);
-		strcat(str,tmp);
-	} else if (stats.st_size>=KB) {
-		sprintf(tmp,"%lldkB",stats.st_size/KB);
-		strcat(str,tmp);
-	} else {
-		sprintf(tmp,"%lldB",stats.st_size);
-		strcat(str, tmp);
-	}
-
-	strcat(str," ");
-
-	strcpy(tmp,"");
-	strcpy(tmp,str);
-	strcpy(str,"");
-	return tmp;
+	/* Shut down Curses */
+	endwin();
+	return 0;
 }

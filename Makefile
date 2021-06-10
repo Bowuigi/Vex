@@ -3,7 +3,7 @@
 IN=main.c
 VEX=vex
 CFLAGS=-Os -ansi -Wall
-LDFLAGS=-lcurses
+LDFLAGS=-lncursesw
 CC=cc
 STRIP=strip
 
