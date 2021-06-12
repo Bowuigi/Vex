@@ -21,18 +21,28 @@
 #define MB 1000*KB
 #define GB 1000*MB
 
+/* Way less than PATH_MAX, to avoid Stack overrun */
+#define MAX_FILENAME_LEN 256
+
+/* Small to avoid Stack overrun */
+/* "rwx directory 99999GB" is the largest string it can handle */
+#define MAX_FPROP_LEN 20
+
 char *getFileProperties(struct stat stats);
 
 typedef struct {
-	char options[PATH_MAX][MAX_OPTIONS];
+	char options[MAX_FILENAME_LEN][MAX_OPTIONS];
 	char fprop[PATH_MAX][MAX_OPTIONS];
 } dir_info;
 
-dir_info ls(char *directory) {
+/* 
+ * Accepts a Malloc'd typedef'd struct defined in the same file
+ * Then returns the contents and some file properties of the directory specified on the second argument
+*/
+int ls(dir_info *result, char *directory) {
 	strcat(directory,"/");
 	struct dirent *de;  /* Pointer for directory entry */
 	DIR *dir = opendir(directory);
-	static dir_info result;
 
 	errno=0;
 
@@ -41,23 +51,36 @@ dir_info ls(char *directory) {
 			errno=13; /* Default to permission denied */
 		}
 		printf("%s\n",strerror(errno));
-		return result;
+		return 1;
 	}
 	int i=0;
 
 	while ((de = readdir(dir)) != NULL) {
 		i++;
 		static struct stat stats; /* Struct holding the stats of a file */
-		char name[256]="";
+		char name[MAX_FILENAME_LEN]="";
 		memcpy(name,de->d_name,sizeof(de->d_name));
-		char path[PATH_MAX+256];
+		char path[PATH_MAX];
 		strcpy(path,directory);
 		strcat(path,name);
 		if (strcmp(name,".")) {
 			errno=0;
 			if (stat(path,&stats)==0) {
-				strcpy(result.fprop[i],getFileProperties(stats));
-				strcpy(result.options[i],name);
+				char *fp=getFileProperties(stats);
+				if (strlen(fp)>MAX_FPROP_LEN) {
+					printf("Attempted to get a file so big, that I have to truncate the size so the file manager doesn't crash, please make it smaller");
+					strncpy(result->fprop[i],fp,sizeof(char)*MAX_FPROP_LEN-1);
+					strcat(result->fprop[i],">");
+				} else {
+					strcpy(result->fprop[i],fp);
+				}
+				if (strlen(name)>MAX_FILENAME_LEN) {
+					printf("Attempted to read a filename longer than 256 characters, why is the filename so long? anyway, I will just truncate it");
+					strncpy(result->options[i],name,sizeof(char)*MAX_FILENAME_LEN-1);
+					strcat(result->options[i],">");
+				} else {
+					strcpy(result->options[i],name);
+				}
 			} else {
 				if (errno==0) {
 					errno=13; /* Default to permission denied */
@@ -69,7 +92,7 @@ dir_info ls(char *directory) {
 
 	closedir(dir);
 
-	return result;
+	return 0;
 }
 
 /*
@@ -77,8 +100,8 @@ dir_info ls(char *directory) {
  * https://codeforwin.org/2018/03/c-program-find-file-properties-using-stat-function.html
 */
 char *getFileProperties(struct stat stats) {
-	char str[MAX_OPTIONS]="";
-	static char tmp[MAX_OPTIONS]="";
+	char str[MAX_FILENAME_LEN]="";
+	static char tmp[MAX_FILENAME_LEN]="";
 
 	/* File permissions */
 	if (stats.st_mode & S_IRUSR) {
@@ -131,7 +154,6 @@ char *getFileProperties(struct stat stats) {
 		strcat(str, tmp);
 	}
 
-	strcat(str," ");
 
 	strcpy(tmp,"");
 	strcpy(tmp,str);

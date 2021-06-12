@@ -4,6 +4,7 @@
 #include <string.h>
 #include "config.h"
 #include "file.h"
+#include <stdlib.h>
 
 char *strtrun(char *str, int length) {
 	static char tmp[PATH_MAX];
@@ -25,6 +26,7 @@ char *strfill(char *str, char fill, int finallength) {
 
 int main(int argc, char **arg) {
 	dir_info files;
+	dir_info *f=malloc(sizeof(files));
 
 	int c='a';
 	char directory[PATH_MAX];
@@ -34,7 +36,7 @@ int main(int argc, char **arg) {
 		strcpy(directory,".");
 	}
 
-	files=ls(directory);
+	ls(f,directory);
 
 	/* Start Curses */
 	WINDOW *w;
@@ -143,5 +145,6 @@ int main(int argc, char **arg) {
 
 	/* Shut down Curses */
 	endwin();
+	free(f);
 	return 0;
 }
