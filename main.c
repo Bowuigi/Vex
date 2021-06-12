@@ -8,7 +8,12 @@
 
 char *strtrun(char *str, int length) {
 	static char tmp[PATH_MAX];
-	strncpy(tmp,str,length);
+	if (strlen(str)>length) {
+		strncpy(tmp,str,length-1);
+		strcat(tmp,">");
+	} else {
+		strcpy(tmp,str);
+	}
 	return tmp;
 }
 
@@ -25,8 +30,7 @@ char *strfill(char *str, char fill, int finallength) {
 }
 
 int main(int argc, char **arg) {
-	dir_info files;
-	dir_info *f=malloc(sizeof(files));
+	dir_info *files = (dir_info*)malloc(sizeof(dir_info));
 
 	int c='a';
 	char directory[PATH_MAX];
@@ -36,7 +40,7 @@ int main(int argc, char **arg) {
 		strcpy(directory,".");
 	}
 
-	ls(f,directory);
+	ls(files,directory);
 
 	/* Start Curses */
 	WINDOW *w;
@@ -80,7 +84,11 @@ int main(int argc, char **arg) {
 			cy++;
 
 		if (c==KEY_RIGHT || c=='l') {
-			break;
+			if (strstr(files->fprop[cy],"directory")) {
+			strcat(directory,"/");
+			strcat(directory,files->options[cy]);
+			ls(files,directory);
+			}
 		}
 
 		if ((int)cy>=(LINES-2)+(int)sy && sy<maxopt)
@@ -94,35 +102,41 @@ int main(int argc, char **arg) {
 
 		int i=1;
 		for (i=1;i<LINES-1;i++) {
-			if (files.options[i+sy]==NULL || strcmp(files.options[i+sy],"")) {
+
+			char so[MAX_FILENAME_LEN];
+			strcpy(so,files->options[i+sy]);
+			char sf[MAX_FPROP_LEN];
+			strcpy(sf,files->fprop[i+sy]);
+
+			if (strcmp(so,"")) {
 				maxopt=i+sy;
 			}
-
+			
 			/* Color Handling */
 
 			/* Executables */
-			if (strstr(files.fprop[i+sy],"x"))
+			if (strstr(sf,"x"))
 				attron(COLOR_PAIR(COLOR_GREEN));
 
 			/* Directories */
-			if ((strstr(files.fprop[i+sy],"directory"))!=NULL)
+			if ((strstr(sf,"directory"))!=NULL)
 				attron(COLOR_PAIR(COLOR_BLUE));
 
 			/*--------------------------*/
 
+
 			if ((i+sy)==cy)
 				attron(A_REVERSE);
 
-			mvprintw(i,1,"%s",strtrun(strfill(files.options[i+sy],' ',COLS-1),COLS-1));
+			mvprintw(i,1,"%s",strtrun(strfill(so,' ',COLS-1),COLS-1));
 
-/*			if ((i+sy)==cy) */
 			attroff(A_REVERSE);
 
 			/* Disable color*/
-			if (strstr(files.fprop[i+sy],"x"))
+			if (strstr(sf,"x"))
 				attroff(COLOR_PAIR(COLOR_GREEN));
 
-			if ((strstr(files.fprop[i+sy],"directory"))!=NULL)
+			if ((strstr(sf,"directory"))!=NULL)
 				attroff(COLOR_PAIR(COLOR_BLUE));
 
 			/*----------------------------*/
@@ -130,7 +144,7 @@ int main(int argc, char **arg) {
 		}
 
 		attron(A_STANDOUT);
-		mvprintw(LINES-1,0," Vex | %s",strtrun(strfill(files.fprop[cy],' ',COLS/2),COLS/2));
+		mvprintw(LINES-1,0," Vex | %s",strtrun(strfill(files->fprop[cy],' ',COLS-1),COLS-1));
 		attroff(A_STANDOUT);
 
 		refresh();
@@ -145,6 +159,9 @@ int main(int argc, char **arg) {
 
 	/* Shut down Curses */
 	endwin();
-	free(f);
+
+	/* Free the malloc'd variable files */
+	free(files);
+
 	return 0;
 }

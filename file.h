@@ -26,13 +26,13 @@
 
 /* Small to avoid Stack overrun */
 /* "rwx directory 99999GB" is the largest string it can handle */
-#define MAX_FPROP_LEN 20
+#define MAX_FPROP_LEN 23
 
 char *getFileProperties(struct stat stats);
 
 typedef struct {
 	char options[MAX_FILENAME_LEN][MAX_OPTIONS];
-	char fprop[PATH_MAX][MAX_OPTIONS];
+	char fprop[MAX_FPROP_LEN][MAX_OPTIONS];
 } dir_info;
 
 /* 
@@ -43,6 +43,8 @@ int ls(dir_info *result, char *directory) {
 	strcat(directory,"/");
 	struct dirent *de;  /* Pointer for directory entry */
 	DIR *dir = opendir(directory);
+
+	memset(result,0,sizeof(dir_info));
 
 	errno=0;
 
@@ -55,7 +57,7 @@ int ls(dir_info *result, char *directory) {
 	}
 	int i=0;
 
-	while ((de = readdir(dir)) != NULL) {
+	while ((de = readdir(dir)) != NULL && i<MAX_OPTIONS) {
 		i++;
 		static struct stat stats; /* Struct holding the stats of a file */
 		char name[MAX_FILENAME_LEN]="";
@@ -75,7 +77,7 @@ int ls(dir_info *result, char *directory) {
 					strcpy(result->fprop[i],fp);
 				}
 				if (strlen(name)>MAX_FILENAME_LEN) {
-					printf("Attempted to read a filename longer than 256 characters, why is the filename so long? anyway, I will just truncate it");
+					printf("Attempted to read a filename longer than 256 characters, why is the filename so long? Anyway, I will just truncate it");
 					strncpy(result->options[i],name,sizeof(char)*MAX_FILENAME_LEN-1);
 					strcat(result->options[i],">");
 				} else {
@@ -100,8 +102,8 @@ int ls(dir_info *result, char *directory) {
  * https://codeforwin.org/2018/03/c-program-find-file-properties-using-stat-function.html
 */
 char *getFileProperties(struct stat stats) {
-	char str[MAX_FILENAME_LEN]="";
-	static char tmp[MAX_FILENAME_LEN]="";
+	char str[MAX_FPROP_LEN]="";
+	static char tmp[MAX_FPROP_LEN]="";
 
 	/* File permissions */
 	if (stats.st_mode & S_IRUSR) {
