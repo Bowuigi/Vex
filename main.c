@@ -67,10 +67,10 @@ int main(int argc, char **arg) {
 	if (has_colors()) {
 		start_color();
 		use_default_colors();
-		init_pair(COLOR_BLUE ,   COLOR_BLUE ,   COLOR_BLACK);
-		init_pair(COLOR_GREEN,   COLOR_GREEN,   COLOR_BLACK);
-		init_pair(COLOR_RED  ,   COLOR_RED  ,   COLOR_BLACK);
-		init_pair(COLOR_WHITE,   COLOR_WHITE,   COLOR_BLACK);
+		init_pair(COLOR_BLUE ,   COLOR_BLUE ,   -1);
+		init_pair(COLOR_GREEN,   COLOR_GREEN,   -1);
+		init_pair(COLOR_RED  ,   COLOR_RED  ,   -1);
+		init_pair(COLOR_WHITE,   COLOR_WHITE,   -1);
 	}
 
 	unsigned int sy=1;
