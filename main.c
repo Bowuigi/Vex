@@ -28,6 +28,13 @@ char *strfill(char *str, char fill, int finallength) {
 	return tmp;
 }
 
+int dir(dir_info *result, char *directory) {
+	if (result->options[LINES-1]!=NULL) {
+		memset(result,(char)0,sizeof(dir_info));
+	}
+	return ls(result,directory);
+}
+
 int main(int argc, char **arg) {
 	dir_info *files = (dir_info*)malloc(sizeof(dir_info));
 
@@ -39,7 +46,7 @@ int main(int argc, char **arg) {
 		strcpy(directory,".");
 	}
 
-	ls(files,directory);
+	dir(files,directory);
 
 	/* Start Curses */
 	WINDOW *w;
@@ -83,7 +90,7 @@ int main(int argc, char **arg) {
 			if (strstr(files->fprop[cy],"directory")) {
 				strcat(directory,"/");
 				strcat(directory,files->options[cy]);
-				ls(files,directory);
+				dir(files,directory);
 				cy=2;
 				sy=1;
 				maxopt=MAX_OPTIONS;
@@ -105,7 +112,7 @@ int main(int argc, char **arg) {
 
 		if (c==KEY_LEFT || c=='h') {
 			strcat(directory,"../");
-			ls(files,directory);
+			dir(files,directory);
 			cy=2;
 			sy=1;
 			maxopt=MAX_OPTIONS;
@@ -120,7 +127,7 @@ int main(int argc, char **arg) {
 			cbreak();
 			if (getch()=='y') {
 				remove(ef);
-				ls(files,directory);
+				dir(files,directory);
 				cy=2;
 				sy=1;
 				maxopt=MAX_OPTIONS;

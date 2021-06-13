@@ -2,4 +2,4 @@
 #define LEN(arr) sizeof(arr)-sizeof(arr[0])
 
 /* Specify the command used to start your editor */
-const char editorcmd[]="micro";
+const char editorcmd[]="vim";

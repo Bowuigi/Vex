@@ -44,8 +44,6 @@ int ls(dir_info *result, char *directory) {
 	struct dirent *de;  /* Pointer for directory entry */
 	DIR *dir = opendir(directory);
 
-	memset(result,0,sizeof(dir_info));
-
 	errno=0;
 
 	if (dir == NULL) {

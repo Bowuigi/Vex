@@ -2,14 +2,14 @@
 
 IN=main.c
 VEX=vex
-CFLAGS=-Os -ansi -Wall
+CFLAGS=-Og -ansi -Wall -g
 LDFLAGS=-lncursesw
-CC=cc
+CC=gcc
 STRIP=strip
 
 build:
 	$(CC) $(IN) $(CFLAGS) $(LDFLAGS) -o $(VEX)
-	$(STRIP) $(VEX)
+#	$(STRIP) $(VEX)
 
 clean:
 	rm $(VEX)
