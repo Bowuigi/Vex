@@ -29,9 +29,7 @@ char *strfill(char *str, char fill, int finallength) {
 }
 
 int dir(dir_info *result, char *directory) {
-	if (result->options[LINES-1]!=NULL) {
-		memset(result,(char)0,sizeof(dir_info));
-	}
+	memset(result,0,sizeof(dir_info));
 	return ls(result,directory);
 }
 
