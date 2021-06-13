@@ -2,11 +2,10 @@
 #include <stdio.h>
 #include <linux/limits.h>
 #include <string.h>
-#include "config.h"
 #include "file.h"
 #include <stdlib.h>
 
-char *strtrun(char *str, int length) {
+char *strtrun(char *str, unsigned int length) {
 	static char tmp[PATH_MAX];
 	if (strlen(str)>length) {
 		strncpy(tmp,str,length-1);
@@ -60,14 +59,11 @@ int main(int argc, char **arg) {
 	/* Init colors */
 	if (has_colors()) {
 		start_color();
-		init_pair(COLOR_BLACK,   COLOR_BLACK,   COLOR_BLACK);
+		use_default_colors();
+		init_pair(COLOR_BLUE ,   COLOR_BLUE ,   COLOR_BLACK);
 		init_pair(COLOR_GREEN,   COLOR_GREEN,   COLOR_BLACK);
-		init_pair(COLOR_RED,     COLOR_RED,     COLOR_BLACK);
-		init_pair(COLOR_CYAN,    COLOR_CYAN,    COLOR_BLACK);
+		init_pair(COLOR_RED  ,   COLOR_RED  ,   COLOR_BLACK);
 		init_pair(COLOR_WHITE,   COLOR_WHITE,   COLOR_BLACK);
-		init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
-		init_pair(COLOR_BLUE,    COLOR_BLUE,    COLOR_BLACK);
-		init_pair(COLOR_YELLOW,  COLOR_YELLOW,  COLOR_BLACK);
 	}
 
 	unsigned int sy=1;
@@ -85,10 +81,51 @@ int main(int argc, char **arg) {
 
 		if (c==KEY_RIGHT || c=='l') {
 			if (strstr(files->fprop[cy],"directory")) {
-			strcat(directory,"/");
-			strcat(directory,files->options[cy]);
-			ls(files,directory);
+				strcat(directory,"/");
+				strcat(directory,files->options[cy]);
+				ls(files,directory);
+				cy=2;
+				sy=1;
+				maxopt=MAX_OPTIONS;
+			} else if (strstr(files->fprop[cy],"file")) {
+				errno=0;
+				char ef[PATH_MAX];
+				strcpy(ef,editorcmd);
+				strcat(ef," ");
+				strcat(ef,directory);
+				strcat(ef,"/");
+				strcat(ef,files->options[cy]);
+				system(ef);
+				if (errno!=0) {
+					printf("Editor execution failed, %s",strerror(errno));
+				}
+				keypad(w,TRUE);
 			}
+		}
+
+		if (c==KEY_LEFT || c=='h') {
+			strcat(directory,"../");
+			ls(files,directory);
+			cy=2;
+			sy=1;
+			maxopt=MAX_OPTIONS;
+		}
+
+		if (c=='d') {
+			char ef[PATH_MAX];
+			strcpy(ef,directory);
+			strcat(ef,"/");
+			strcat(ef,files->options[cy]);
+			nocbreak();
+			cbreak();
+			if (getch()=='y') {
+				remove(ef);
+				ls(files,directory);
+				cy=2;
+				sy=1;
+				maxopt=MAX_OPTIONS;
+			}
+			halfdelay(3);
 		}
 
 		if ((int)cy>=(LINES-2)+(int)sy && sy<maxopt)
@@ -111,7 +148,7 @@ int main(int argc, char **arg) {
 			if (strcmp(so,"")) {
 				maxopt=i+sy;
 			}
-			
+
 			/* Color Handling */
 
 			/* Executables */
@@ -152,6 +189,7 @@ int main(int argc, char **arg) {
 	}
 
 	/* Revert settings */
+	clear();
 	curs_set(1);/* show cursor */
 	keypad(w,FALSE);
 	nocbreak();

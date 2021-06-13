@@ -35,7 +35,7 @@ typedef struct {
 	char fprop[MAX_FPROP_LEN][MAX_OPTIONS];
 } dir_info;
 
-/* 
+/*
  * Accepts a Malloc'd typedef'd struct defined in the same file
  * Then returns the contents and some file properties of the directory specified on the second argument
 */
@@ -65,30 +65,29 @@ int ls(dir_info *result, char *directory) {
 		char path[PATH_MAX];
 		strcpy(path,directory);
 		strcat(path,name);
-		if (strcmp(name,".")) {
-			errno=0;
-			if (stat(path,&stats)==0) {
-				char *fp=getFileProperties(stats);
-				if (strlen(fp)>MAX_FPROP_LEN) {
-					printf("Attempted to get a file so big, that I have to truncate the size so the file manager doesn't crash, please make it smaller");
-					strncpy(result->fprop[i],fp,sizeof(char)*MAX_FPROP_LEN-1);
-					strcat(result->fprop[i],">");
-				} else {
-					strcpy(result->fprop[i],fp);
-				}
-				if (strlen(name)>MAX_FILENAME_LEN) {
-					printf("Attempted to read a filename longer than 256 characters, why is the filename so long? Anyway, I will just truncate it");
-					strncpy(result->options[i],name,sizeof(char)*MAX_FILENAME_LEN-1);
-					strcat(result->options[i],">");
-				} else {
-					strcpy(result->options[i],name);
-				}
+
+		errno=0;
+		if (stat(path,&stats)==0) {
+			char *fp=getFileProperties(stats);
+			if (strlen(fp)>MAX_FPROP_LEN) {
+				printf("Attempted to get a file so big, that I have to truncate the size so the file manager doesn't crash, please make it smaller");
+				strncpy(result->fprop[i],fp,sizeof(char)*MAX_FPROP_LEN-1);
+				strcat(result->fprop[i],">");
 			} else {
-				if (errno==0) {
-					errno=13; /* Default to permission denied */
-				}
-				printf("%s: %s\n",name,strerror(errno));
+				strcpy(result->fprop[i],fp);
 			}
+			if (strlen(name)>MAX_FILENAME_LEN) {
+				printf("Attempted to read a filename longer than 256 characters, why is the filename so long? Anyway, I will just truncate it");
+				strncpy(result->options[i],name,sizeof(char)*MAX_FILENAME_LEN-1);
+				strcat(result->options[i],">");
+			} else {
+				strcpy(result->options[i],name);
+			}
+		} else {
+			if (errno==0) {
+				errno=13; /* Default to permission denied */
+			}
+			printf("%s: %s\n",name,strerror(errno));
 		}
 	}
 
