@@ -34,7 +34,7 @@ int dir(dir_info *result, char *directory) {
 }
 
 int main(int argc, char **arg) {
-	dir_info *files = (dir_info*)malloc(sizeof(dir_info));
+	dir_info *files = malloc(sizeof(dir_info));
 
 	int c='a';
 	char directory[PATH_MAX];
@@ -145,9 +145,9 @@ int main(int argc, char **arg) {
 		int i=1;
 		for (i=1;i<LINES-1;i++) {
 
-			char so[MAX_FILENAME_LEN];
+			char so[MAX_OPTIONS];
 			strcpy(so,files->options[i+sy]);
-			char sf[MAX_FPROP_LEN];
+			char sf[MAX_OPTIONS];
 			strcpy(sf,files->fprop[i+sy]);
 
 			if (strcmp(so,"")) {
