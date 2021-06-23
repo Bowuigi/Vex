@@ -29,7 +29,7 @@ char *strfill(char *str, char fill, int finallength) {
 }
 
 int dir(dir_info *result, char *directory) {
-	memset(result,0,sizeof(dir_info));
+	memset(result,(char)0,sizeof(dir_info));
 	return ls(result,directory);
 }
 
@@ -100,8 +100,8 @@ int main(int argc, char **arg) {
 				strcat(ef,directory);
 				strcat(ef,"/");
 				strcat(ef,files->options[cy]);
-				system(ef);
-				if (errno!=0) {
+				int r=system(ef);
+				if (r==-1 && errno!=0) {
 					printf("Editor execution failed, %s",strerror(errno));
 				}
 				keypad(w,TRUE);
@@ -144,10 +144,13 @@ int main(int argc, char **arg) {
 
 		int i=1;
 		for (i=1;i<LINES-1;i++) {
+			if ((i+sy)>=MAX_OPTIONS) {
+				break;
+			}
 
-			char so[MAX_OPTIONS];
+			char so[MAX_FILENAME_LEN];
 			strcpy(so,files->options[i+sy]);
-			char sf[MAX_OPTIONS];
+			char sf[MAX_FPROP_LEN];
 			strcpy(sf,files->fprop[i+sy]);
 
 			if (strcmp(so,"")) {
