@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <linux/limits.h>
 #include <string.h>
-#include "file.h"
+#include "utils.c"
 #include <stdlib.h>
 
 char *strtrun(char *str, unsigned int length) {
