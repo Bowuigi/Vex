@@ -22,8 +22,8 @@
 #define MAX_FPROP_LEN 23
 
 typedef struct {
-	char options[MAX_FILENAME_LEN][MAX_OPTIONS];
-	char fprop[MAX_FPROP_LEN][MAX_OPTIONS];
+	char options[MAX_OPTIONS][MAX_FILENAME_LEN];
+	char fprop[MAX_OPTIONS][MAX_FPROP_LEN];
 } dir_info;
 
 #endif /* VEX_FILE_H */
