@@ -1,9 +1,9 @@
-#include <ncurses.h>
 #include <stdio.h>
 #include <linux/limits.h>
 #include <string.h>
 #include "utils.c"
 #include <stdlib.h>
+#include <curses.h>
 
 char *strtrun(char *str, unsigned int length) {
 	static char tmp[PATH_MAX];
@@ -105,6 +105,7 @@ int main(int argc, char **arg) {
 					printf("Editor execution failed, %s",strerror(errno));
 				}
 				keypad(w,TRUE);
+				clear();
 			}
 		}
 
@@ -121,6 +122,12 @@ int main(int argc, char **arg) {
 			strcpy(ef,directory);
 			strcat(ef,"/");
 			strcat(ef,files->options[cy]);
+			attron(COLOR_PAIR(COLOR_RED));
+			attron(A_STANDOUT);
+			mvprintw(LINES-1,25,"d");
+			attroff(COLOR_PAIR(COLOR_RED));
+			attroff(A_STANDOUT);
+			refresh();
 			nocbreak();
 			cbreak();
 			if (getch()=='y') {
@@ -140,7 +147,7 @@ int main(int argc, char **arg) {
 			sy--;
 
 		/* Draw */
-		clear();
+		erase();
 
 		int i=1;
 		for (i=1;i<LINES-1;i++) {
