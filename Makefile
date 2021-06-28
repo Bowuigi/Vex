@@ -2,9 +2,10 @@
 
 IN=main.c
 VEX=vex
-CFLAGS=-Og -ansi -Wall -g
+CFLAGS=-Og -ansi -Wall
 LDFLAGS=-lncursesw
-CC=gcc
+CC=cc
+PREFIX=/usr/local
 
 build:
 	$(CC) $(IN) $(CFLAGS) $(LDFLAGS) -o $(VEX)
