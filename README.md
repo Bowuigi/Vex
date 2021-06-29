@@ -10,6 +10,9 @@ To build it, use `make`
 
 To install it, use `sudo make install`
 
+To put a desktop file on the desktop, use `make desktop`
+
+To integrate it with your system, use `sudo make integrate`
 Features
 ---
 
