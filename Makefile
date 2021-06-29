@@ -22,7 +22,7 @@ install: build
 uninstall:
 	rm -f $(PREFIX)/bin/$(OUT)
 
-desktop:
+desktop: install
 	echo "#!/usr/bin/env xdg-open" > $(DESKTOP_FILE)
 	echo "Comment = A simple curses based terminal file manager." >> $(DESKTOP_FILE)
 	echo "Type = Application" >> $(DESKTOP_FILE)
