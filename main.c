@@ -38,6 +38,7 @@ int main(int argc, char **arg) {
 
 	int c='a';
 	char directory[PATH_MAX];
+	char tmpd[PATH_MAX+2];
 	if (argc>1) {
 		strcpy(directory,arg[1]);
 	} else {
@@ -88,6 +89,11 @@ int main(int argc, char **arg) {
 			if (strstr(files->fprop[cy],"directory")) {
 				strcat(directory,"/");
 				strcat(directory,files->options[cy]);
+				strcpy(tmpd,"\"");
+				strcat(tmpd,directory);
+				strcat(tmpd,"\"");
+				endwin();
+				fprintf(stderr,"%s\n%s\n",tmpd,directory);
 				dir(files,directory);
 				cy=2;
 				sy=1;
