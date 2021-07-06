@@ -106,6 +106,9 @@ int main(int argc, char **arg) {
 				strcat(ef,"/");
 				strcat(ef,files->options[cy]);
 				strcat(ef,"\"");
+				/* Debug */
+				endwin();
+				fprintf(stderr,"%s\n%s\n",ef,directory);
 				int r=system(ef);
 				if (r==-1 && errno!=0) {
 					printf("Editor execution failed, %s",strerror(errno));
