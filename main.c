@@ -92,8 +92,6 @@ int main(int argc, char **arg) {
 				strcpy(tmpd,"\"");
 				strcat(tmpd,directory);
 				strcat(tmpd,"\"");
-				endwin();
-				fprintf(stderr,"%s\n%s\n",tmpd,directory);
 				dir(files,directory);
 				cy=2;
 				sy=1;
