@@ -101,10 +101,11 @@ int main(int argc, char **arg) {
 				char ef[PATH_MAX];
 				strcpy(ef,editorcmd);
 				strcat(ef," ");
+				strcat(ef,"\"");
 				strcat(ef,directory);
 				strcat(ef,"/");
 				strcat(ef,files->options[cy]);
-				/* DEBUG */ endwin(); fprintf(stderr,"%s",ef);
+				strcat(ef,"\"");
 				int r=system(ef);
 				if (r==-1 && errno!=0) {
 					printf("Editor execution failed, %s",strerror(errno));
