@@ -1,13 +1,11 @@
-/*
- * Vex, a file manager inspired by NetRW in Vim
- * By Bowuigi
-* Licensed under the GNU GPLv3
-*/
+#ifndef VEX_GLOBALS_H
+#define VEX_GLOBALS_H
 
-#ifndef VEX_FILE_H
-#define VEX_FILE_H
-
-#include "config.h"
+#include <stdio.h>
+#include <string.h>
+#include <curses.h>
+#include <linux/limits.h>
+#define MAX_OPTIONS 1024
 
 /* Define byte sizes */
 #define KB 1000
@@ -26,4 +24,14 @@ typedef struct {
 	char fprop[MAX_OPTIONS][MAX_FPROP_LEN];
 } dir_info;
 
-#endif /* VEX_FILE_H */
+
+unsigned int sy=2;
+unsigned int cy=2;
+unsigned int maxopt=MAX_OPTIONS;
+int c='a';
+char directory[PATH_MAX];
+char tmpd[PATH_MAX+2];
+dir_info *files;
+WINDOW *w;
+
+#endif /* VEX_GLOBALS_H */

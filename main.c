@@ -1,44 +1,9 @@
-#include <stdio.h>
-#include <linux/limits.h>
-#include <string.h>
-#include "utils.c"
 #include <stdlib.h>
-#include <curses.h>
+#include "config.h"
 
-char *strtrun(char *str, unsigned int length) {
-	static char tmp[PATH_MAX];
-	if (strlen(str)>length) {
-		strncpy(tmp,str,length-1);
-		strcat(tmp,">");
-	} else {
-		strcpy(tmp,str);
-	}
-	return tmp;
-}
-
-char *strfill(char *str, char fill, int finallength) {
-	static char tmp[PATH_MAX];
-	strcpy(tmp,str);
-	int len=strlen(str);
-	int f=len;
-	for (f=len;f<finallength;f++) {
-		tmp[f]=fill;
-	}
-	tmp[finallength]='\0';
-	return tmp;
-}
-
-int dir(dir_info *result, char *directory) {
-	memset(result,(char)0,sizeof(dir_info));
-	return ls(result,directory);
-}
-
+/* --------------------------------------- Main Function ----------------------------------------- */
 int main(int argc, char **arg) {
-	dir_info *files = malloc(sizeof(dir_info));
-
-	int c='a';
-	char directory[PATH_MAX];
-	char tmpd[PATH_MAX+2];
+	files=malloc(sizeof(dir_info));
 	if (argc>1) {
 		strcpy(directory,arg[1]);
 	} else {
@@ -48,7 +13,6 @@ int main(int argc, char **arg) {
 	dir(files,directory);
 
 	/* Start Curses */
-	WINDOW *w;
 	w = initscr();
 
 	if (w==NULL) {
@@ -72,94 +36,28 @@ int main(int argc, char **arg) {
 		init_pair(COLOR_WHITE,   COLOR_WHITE,   -1);
 	}
 
-	unsigned int sy=1;
-	unsigned int cy=2;
-	unsigned int maxopt=MAX_OPTIONS;
 
 	while (c!='q') {
 		/* Update */
 		c=getch();
 
-		if ((c==KEY_UP || c=='k') && cy>2)
-			cy--;
-		if ((c==KEY_DOWN || c=='j') && cy<maxopt)
-			cy++;
-
-		if (c==KEY_RIGHT || c=='l') {
-			if (strstr(files->fprop[cy],"directory")) {
-				strcat(directory,"/");
-				strcat(directory,files->options[cy]);
-				strcpy(tmpd,"\"");
-				strcat(tmpd,directory);
-				strcat(tmpd,"\"");
-				dir(files,directory);
-				cy=2;
-				sy=1;
-				maxopt=MAX_OPTIONS;
-			} else if (strstr(files->fprop[cy],"file")) {
-				errno=0;
-				char ef[PATH_MAX];
-				strcpy(ef,editorcmd);
-				strcat(ef," ");
-				strcat(ef,"\"");
-				strcat(ef,directory);
-				strcat(ef,"/");
-				strcat(ef,files->options[cy]);
-				strcat(ef,"\"");
-				/* Debug */
-				endwin();
-				fprintf(stderr,"%s\n%s\n",ef,directory);
-				int r=system(ef);
-				if (r==-1 && errno!=0) {
-					printf("Editor execution failed, %s",strerror(errno));
-				}
-				keypad(w,TRUE);
-				clear();
-			}
-		}
-
-		if (c==KEY_LEFT || c=='h') {
-			strcat(directory,"../");
-			dir(files,directory);
-			cy=2;
-			sy=1;
-			maxopt=MAX_OPTIONS;
-		}
-
-		if (c=='d') {
-			char ef[PATH_MAX];
-			strcpy(ef,directory);
-			strcat(ef,"/");
-			strcat(ef,files->options[cy]);
-			attron(COLOR_PAIR(COLOR_RED));
-			attron(A_STANDOUT);
-			mvprintw(LINES-1,25,"d");
-			attroff(COLOR_PAIR(COLOR_RED));
-			attroff(A_STANDOUT);
-			refresh();
-			nocbreak();
-			cbreak();
-			if (getch()=='y') {
-				remove(ef);
-				dir(files,directory);
-				cy=2;
-				sy=1;
-				maxopt=MAX_OPTIONS;
-			}
-			halfdelay(3);
-		}
-
-		if ((int)cy>=(LINES-2)+(int)sy && sy<maxopt)
+		if ((int)cy>=(LINES-3)+(int)sy && sy<maxopt)
 			sy++;
 
 		if ((int)cy<=(int)sy+1 && sy>1)
 			sy--;
 
+		int k=0;
+		for (k=0;k<KEY_AMOUNT;k++) {
+			if (c==keys[k].keycode)
+				keys[k].trigger();
+		}
+
 		/* Draw */
 		erase();
 
 		int i=1;
-		for (i=1;i<LINES-1;i++) {
+		for (i=1;i<LINES-2;i++) {
 			if ((i+sy)>=MAX_OPTIONS) {
 				break;
 			}
@@ -201,12 +99,12 @@ int main(int argc, char **arg) {
 				attroff(COLOR_PAIR(COLOR_BLUE));
 
 			/*----------------------------*/
-
 		}
 
 		attron(A_STANDOUT);
-		mvprintw(LINES-1,0," Vex | %s",strtrun(strfill(files->fprop[cy],' ',COLS-1),COLS-1));
+		mvprintw(LINES-2,0," Vex | %s",strtrun(strfill(files->fprop[cy],' ',COLS-1),COLS-1));
 		attroff(A_STANDOUT);
+		loginfo("normal",""); /* HACK: Clear the bottom part of the screen */
 
 		refresh();
 		/* End */
@@ -227,3 +125,4 @@ int main(int argc, char **arg) {
 
 	return 0;
 }
+/* ------ End main function ------ */

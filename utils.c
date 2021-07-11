@@ -1,4 +1,5 @@
-#include <stdio.h>
+#ifndef VEX_UTILS_C
+#define VEX_UTILS_C
 #include <dirent.h>
 #include <string.h>
 #include <errno.h>
@@ -6,10 +7,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <linux/limits.h>
-#include <string.h>
-#include "file.h"
-
+#include "globals.h"
 /*
  * Heavily modified version of
  * https://codeforwin.org/2018/03/c-program-find-file-properties-using-stat-function.html
@@ -134,3 +132,5 @@ int ls(dir_info *result, char *directory) {
 
 	return 0;
 }
+
+#endif /* VEX_UTILS_C */
