@@ -31,3 +31,10 @@ To put a desktop file on every user's desktop, use =make desktop=
 + Better messages for easier readability
 + Better small screen support
 + Searching, this will drastically improve usage speed, but will be hard to implement with a decent performance.
+
+* Progress on the planned features
++ Rewrite: currently going, I am still thinking on how will the include chain be.
++ Better small screen support: The loginfo() function included in the rewrite has support for small screens, most of the stuff on the application window is truncated when the screen is too small.
++ Searching: A demo on a program that searches stdin with a good performance was made and tested. The feature will be implemented as soon as the rewrite is finished.
++ Basic operations: Concepts have been made, will be implemented after searching.
++ Executing binary files: still in a thinking process, probably stopping curses during the program execution and asking for confirmation before opening it again.
