@@ -1,128 +1,96 @@
-#include <stdlib.h>
-#include "config.h"
+#include <stdio.h>
+#include "termbox-tomas/termbox.h"
 
-/* --------------------------------------- Main Function ----------------------------------------- */
-int main(int argc, char **arg) {
-	files=malloc(sizeof(dir_info));
-	if (argc>1) {
-		strcpy(directory,arg[1]);
-	} else {
-		strcpy(directory,".");
+// set up our colors
+tb_color fg_color = TB_WHITE;
+tb_color bg_color = TB_DEFAULT;
+tb_color error_color = TB_RED;
+tb_color mode_color = TB_BLUE;
+tb_color pwd_color = TB_LIGHT_GREY;
+tb_color status_color = TB_LIGHT_GREY;
+
+// Managing colors
+tb_color dir_color = TB_BLUE;
+tb_color exec_color = TB_GREEN;
+tb_color dev_color = TB_MAGENTA;
+tb_color file_color = TB_LIGHT_GREY;
+
+// Vex Globals
+char mode='n';
+
+#define MAX_COLOR_VALUE 255
+
+void draw_line(int startx, int endx, int y, tb_color bg, tb_color fg, char line) {
+	int i=0;
+	for (i=0; i<endx; i++) {
+		tb_char(startx+i,y,bg,fg,line);
+	}
+}
+
+void draw(int w, int h) {
+	tb_stringf(0, 0, pwd_color|TB_REVERSE, bg_color, " %s/ ","~/C/projects");
+	tb_string(w-5, 0, fg_color, mode_color, " Vex ");
+	draw_line(0,w,h-2,fg_color, bg_color,' ');
+	tb_string(0, h-2, status_color|TB_REVERSE, bg_color, " 4MB file - rwx ");
+	tb_stringf(w-3, h-2, fg_color, mode_color, " %c ",mode);
+	tb_string(1, h-1, error_color, bg_color, "Permission denied");
+
+	// Sample text
+	tb_string(1, 1, dir_color, bg_color, "Directory/");
+	tb_string(1, 2, dir_color, bg_color, "Directory2/");
+	tb_string(1, 3, exec_color, bg_color, "* executable");
+	tb_string(1, 4, exec_color, bg_color, "* executable2");
+	tb_string(1, 5, dev_color, bg_color, "- device");
+	tb_string(1, 6, dev_color, bg_color, "- device2");
+	tb_string(1, 7, file_color, bg_color, "file");
+	tb_string(1, 8, file_color, bg_color, "file2");
+
+	tb_render();
+}
+
+int main(void) {
+	if (tb_init() != 0) {
+		return 1; // couldn't initialize our screen
 	}
 
-	dir(files,directory);
+	// get the screen resolution
+	int w = tb_width();
+	int h = tb_height();
 
-	/* Start Curses */
-	w = initscr();
+	draw(w,h);
 
-	if (w==NULL) {
-		printf("Failed starting Curses");
-	}
+	// now, wait for keyboard or input
+	struct tb_event ev;
 
-	/* Curses settings */
-	noecho();
-	cbreak();
-	keypad(w,TRUE);
-	halfdelay(3);
-	curs_set(0); /* hide cursor */
+	while (tb_poll_event(&ev) != -1) {
+		switch (ev.type) {
+		case TB_EVENT_RESIZE:
+			w = ev.w;
+			h = ev.h;
+			tb_clear_buffer();
+			break;
 
-	/* Init colors */
-	if (has_colors()) {
-		start_color();
-		use_default_colors();
-		init_pair(COLOR_BLUE ,   COLOR_BLUE ,   -1);
-		init_pair(COLOR_GREEN,   COLOR_GREEN,   -1);
-		init_pair(COLOR_RED  ,   COLOR_RED  ,   -1);
-		init_pair(COLOR_WHITE,   COLOR_WHITE,   -1);
-	}
+		case TB_EVENT_KEY:
+			if (ev.ch == 'q')
+				goto done;
 
+			if (ev.ch == 'f')
+				mode='f';
 
-	while (c!='q') {
-		/* Update */
-		c=getch();
+			if (ev.key==TB_KEY_ESC)
+				mode='n';
 
-		if ((int)cy>=(LINES-3)+(int)sy && sy<maxopt)
-			sy++;
-
-		if ((int)cy<=(int)sy+1 && sy>1)
-			sy--;
-
-		int k=0;
-		for (k=0;k<KEY_AMOUNT;k++) {
-			if (c==keys[k].keycode)
-				keys[k].trigger();
+			break;
 		}
 
-		/* Draw */
-		erase();
+		draw(w,h);
 
-		int i=1;
-		for (i=1;i<LINES-2;i++) {
-			if ((i+sy)>=MAX_OPTIONS) {
-				break;
-			}
-
-			char so[MAX_FILENAME_LEN];
-			strcpy(so,files->options[i+sy]);
-			char sf[MAX_FPROP_LEN];
-			strcpy(sf,files->fprop[i+sy]);
-
-			if (strcmp(so,"")) {
-				maxopt=i+sy;
-			}
-
-			/* Color Handling */
-
-			/* Executables */
-			if (strstr(sf,"x"))
-				attron(COLOR_PAIR(COLOR_GREEN));
-
-			/* Directories */
-			if ((strstr(sf,"directory"))!=NULL)
-				attron(COLOR_PAIR(COLOR_BLUE));
-
-			/*--------------------------*/
-
-
-			if ((i+sy)==cy)
-				attron(A_REVERSE);
-
-			mvprintw(i,1,"%s",strtrun(strfill(so,' ',COLS-1),COLS-1));
-
-			attroff(A_REVERSE);
-
-			/* Disable color*/
-			if (strstr(sf,"x"))
-				attroff(COLOR_PAIR(COLOR_GREEN));
-
-			if ((strstr(sf,"directory"))!=NULL)
-				attroff(COLOR_PAIR(COLOR_BLUE));
-
-			/*----------------------------*/
-		}
-
-		attron(A_STANDOUT);
-		mvprintw(LINES-2,0," Vex | %s",strtrun(strfill(files->fprop[cy],' ',COLS-1),COLS-1));
-		attroff(A_STANDOUT);
-		loginfo("normal",""); /* HACK: Clear the bottom part of the screen */
-
-		refresh();
-		/* End */
+		// flush the output
+		tb_render();
 	}
 
-	/* Revert settings */
-	clear();
-	curs_set(1);/* show cursor */
-	keypad(w,FALSE);
-	nocbreak();
-	echo();
-
-	/* Shut down Curses */
-	endwin();
-
-	/* Free the malloc'd variable files */
-	free(files);
-
+	done:
+	// make sure to shutdown
+	tb_shutdown();
 	return 0;
 }
-/* ------ End main function ------ */

@@ -1,9 +1,8 @@
 # Makefile for Vex, the file manager inspired on NetRW from Vim
 
-IN=main.c
+IN=$(shell find -iname '*.c')
 OUT=vex
-CFLAGS=-Og -ansi -Wall
-LDFLAGS=-lncursesw
+CFLAGS=-Og -std=c99 -Wall
 CC=cc
 PREFIX=/usr/local
 DESKTOP_DIR=$(PREFIX)/share/applications
