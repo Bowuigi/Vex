@@ -9,7 +9,7 @@ DESKTOP_DIR=$(PREFIX)/share/applications
 DESKTOP_FILE=vex.desktop
 
 build:
-	$(CC) $(IN) $(CFLAGS) $(LDFLAGS) -o $(OUT)
+	$(CC) $(IN) $(CFLAGS) -o $(OUT)
 
 clean:
 	rm $(OUT)
