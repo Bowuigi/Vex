@@ -1,22 +1,5 @@
 #include <stdio.h>
-#include "termbox-tomas/termbox.h"
-
-// Configuration
-// Set up our colors
-tb_color fg_color = TB_WHITE;
-tb_color bg_color = TB_DEFAULT;
-tb_color error_color = TB_RED;
-tb_color mode_color = TB_BLUE;
-tb_color pwd_color = TB_LIGHT_GREY;
-tb_color status_color = TB_LIGHT_GREY;
-
-// Managing colors
-tb_color dir_color = TB_BLUE;
-tb_color exec_color = TB_GREEN;
-tb_color dev_color = TB_MAGENTA;
-tb_color file_color = TB_LIGHT_GREY;
-
-// End configuration
+#include "config.h"
 
 // Vex Globals
 char mode='n';
@@ -50,14 +33,13 @@ void draw(int w, int h) {
 	int sep=w/windows;
 	int i=0;
 	for (i=0;i<windows;i++) {
-		tb_string((i*sep)+1, 1, dir_color, bg_color, "Directory/");
-		tb_string((i*sep)+1, 2, dir_color, bg_color, "Directory2/");
-		tb_string((i*sep)+1, 3, exec_color, bg_color, "* executable");
-		tb_string((i*sep)+1, 4, exec_color, bg_color, "* executable2");
-		tb_string((i*sep)+1, 5, dev_color, bg_color, "- device");
-		tb_string((i*sep)+1, 6, dev_color, bg_color, "- device2");
-		tb_string((i*sep)+1, 7, file_color, bg_color, "file");
-		tb_string((i*sep)+1, 8, file_color, bg_color, "file2");
+		tb_stringf((i*sep)+1, 1, dir_color, bg_color, "%s%s%s",dir_prefix,"Directory1",dir_suffix);
+		tb_stringf((i*sep)+1, 2, dir_color, bg_color, "%s%s%s",dir_prefix,"Directory2",dir_suffix);
+		tb_stringf((i*sep)+1, 3, exec_color, bg_color,"%s%s%s",exec_prefix,"executable1",exec_suffix);
+		tb_stringf((i*sep)+1, 4, exec_color, bg_color,"%s%s%s",exec_prefix,"executable2",exec_suffix);
+		tb_stringf((i*sep)+1, 5, dev_color, bg_color,"%s%s%s",dev_prefix,"device",dev_suffix);
+		tb_stringf((i*sep)+1, 6, dev_color, bg_color,"%s%s%s",dev_prefix,"device2",dev_suffix);
+		tb_stringf((i*sep)+1, 7, file_color, bg_color,"%s%s%s",file_prefix,"file",file_suffix);
 		if ((i*sep)-1 > 0)
 			draw_vline((i*sep)-1, 1, h-3, mode_color, bg_color, '|');
 	}
@@ -84,7 +66,7 @@ int main(void) {
 		case TB_EVENT_RESIZE:
 			w = ev.w;
 			h = ev.h;
-			
+
 			if (windows>h/5) {
 				windows=h/5;
 			}
