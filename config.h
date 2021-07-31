@@ -4,6 +4,8 @@
 #define VEX_CONFIG_H
 
 #include "termbox-tomas/termbox.h"
+#include "keyfuncs.h"
+
 // Set up our colors
 tb_color fg_color = TB_WHITE;
 tb_color bg_color = TB_DEFAULT;
@@ -32,5 +34,13 @@ const char *dev_suffix = "";
 // Normal files
 const char *file_prefix = "";
 const char *file_suffix = "";
+
+struct key keys[] = {
+	{.keycode='f', .trigger=find_mode},
+	{.keycode='w', .trigger=create_window},
+	{.keycode='x', .trigger=delete_window}
+};
+
+const size_t keys_length = sizeof(keys)/sizeof(keys[0]);
 
 #endif // VEX_CONFIG_H header guard
