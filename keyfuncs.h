@@ -17,3 +17,21 @@ void delete_window(state *s) {
 		s->windows--;
 	}
 }
+
+void cursor_up(state *s) {
+	if (s->cursor_y>1)
+		s->cursor_y--;
+}
+
+void cursor_down(state *s) {
+	if (s->cursor_y<10)
+		s->cursor_y++;
+}
+
+void next_window(state *s) {
+	tb_clear_buffer();
+	s->cursor_window++;
+
+	if (s->cursor_window>=s->windows)
+		s->cursor_window=0;
+}

@@ -21,10 +21,14 @@ void draw_vline(int x,int starty, int endy, tb_color bg, tb_color fg, char line)
 }
 
 void draw(int w, int h) {
+	if (s.cursor_window>=s.windows)
+		s.cursor_window=s.windows-1;
+
 	tb_stringf(0, 0, pwd_color|TB_REVERSE, bg_color, " %s/ ","~/C/projects");
 	tb_string(w-5, 0, fg_color, mode_color, " Vex ");
 	draw_hline(0,w,h-2,fg_color, bg_color,' ');
 	tb_string(0, h-2, status_color|TB_REVERSE, bg_color, " 4MB file - rwx ");
+	tb_stringf(w-10, h-2, fg_color, win_n_color, "[%i/%i]",s.cursor_window+1,s.windows);
 	tb_stringf(w-3, h-2, fg_color, mode_color, " %c ",s.mode);
 	tb_string(1, h-1, error_color, bg_color, "Permission denied");
 
@@ -39,6 +43,11 @@ void draw(int w, int h) {
 		tb_stringf((i*sep)+1, 5, dev_color, bg_color,"%s%s%s",dev_prefix,"device",dev_suffix);
 		tb_stringf((i*sep)+1, 6, dev_color, bg_color,"%s%s%s",dev_prefix,"device2",dev_suffix);
 		tb_stringf((i*sep)+1, 7, file_color, bg_color,"%s%s%s",file_prefix,"file",file_suffix);
+
+		if (i==s.cursor_window) {
+			tb_string((i*sep)+1, 8, fg_color|TB_REVERSE, bg_color, "C");
+		}
+
 		if ((i*sep)-1 > 0)
 			draw_vline((i*sep)-1, 1, h-3, mode_color, bg_color, '|');
 	}
@@ -50,6 +59,8 @@ int main(void) {
 	if (tb_init() != 0) {
 		return 1; // couldn't initialize our screen
 	}
+
+	tb_set_title("Vex ~/C/projects/");
 
 	// Current mode
 	s.mode='n';

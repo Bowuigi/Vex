@@ -9,6 +9,8 @@ typedef struct {
 	char mode;
 	int16_t w;
 	int16_t h;
+	int cursor_y;
+	int cursor_window;
 } state;
 
 struct key {
