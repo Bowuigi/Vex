@@ -3,8 +3,13 @@
 
 * A file manager inspired by NetRW on Vim
 
+[[https://img.shields.io/tokei/lines/github/Bowuigi/Vex?color=blue&label=Lines%20of%20Code&logo=C&logoColor=white&style=flat-square]]
+[[https://img.shields.io/github/license/Bowuigi/Vex?color=green&label=License&logo=gnu&logoColor=black&style=flat-square]]
+
 * Installation
-Clone it by doing =git clone https://github.com/Bowuigi/Vex=
++Clone it by doing git clone https://github.com/Bowuigi/Vex+ Download the latest working commit: =curl https://github.com/Bowuigi/Vex/archive/9d3981704023024863dd314aa0c9ef93fa6b3ead.zip > Vex.zip=
+
+Unzip the downloaded zip: =unzip Vex.zip=
 
 To build it, use =make=
 
@@ -12,29 +17,29 @@ To install it, use =sudo make install=
 
 To put a desktop file on every user's desktop, use =make desktop=
 
-* Features
+* Features of the latest working commit
 + Open files your editor of choice (changed at compile time)
 + Delete files (press `d` and then `y` on the file you want to delete)
 + Browse through files
 + Compatible with transparency
 + Tiny
-+ That is it, it is a small project
++ That is it, it +is+ was a small project
 
-* Planned features
-+ Execute binary files
-+ Basic operations (cut, copy, paste, rename, creating files and folders, etc.)
-+ A rewrite (in progress, this org document is the first part), this will result in:
-  * Better performance
-  * Better ways to configure keybindings
-  * Better codebase
-  * Logging functions, for easier error handling and communication with the user.
-+ Better messages for easier readability
-+ Better small screen support
-+ Searching, this will drastically improve usage speed, but will be hard to implement with a decent performance.
-
-* Progress on the planned features
-+ Rewrite: currently going, I am still thinking on how will the include chain be.
-+ Better small screen support: The loginfo() function included in the rewrite has support for small screens, most of the stuff on the application window is truncated when the screen is too small.
-+ Searching: A demo on a program that searches stdin with a good performance was made and tested. The feature will be implemented as soon as the rewrite is finished.
-+ Basic operations: Concepts have been made, will be implemented after searching.
-+ Executing binary files: still in a thinking process, probably stopping curses during the program execution and asking for confirmation before opening it again.
+* Planned features [0/6] [0%]
+- [ ] Execute binary files
+- [ ] Basic operations (cut, copy, paste, rename, creating files and folders, etc.)
+- [-] A rewrite (in progress, this org document is the first part), this will result in:
+  - [-] Better performance [1/3] [33%]
+    - [X] Use a state based implementation (can be passed to other functions easily)
+    - [ ] Optimize the way files are displayed and retrieved
+    - [ ] Use dynamic lists to save memory at the cost of a little memory management
+  - [-] Better ways to configure keybindings [2/4] [50%]
+    - [X] Char based keybinding configuration
+    - [X] That system on config file
+    - [ ] Being able to bind special keys
+    - [ ] Being able to bind unicode characters
+  - [X] Better codebase (as of now it is much better)
+  - [ ] Logging functions, for easier error handling and communication with the user.
+- [ ] Better messages for easier readability
+- [ ] Better small screen support
+- [ ] Searching, this will drastically improve usage speed, but will be hard to implement with a decent performance.
