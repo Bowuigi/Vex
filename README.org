@@ -1,10 +1,11 @@
-#+TITLE: Readme
+#+TITLE: Vex
 #+OPTIONS: toc:nil
 
 * A file manager inspired by NetRW on Vim
 
-[[https://img.shields.io/tokei/lines/github/Bowuigi/Vex?color=blue&label=Lines%20of%20Code&logo=C&logoColor=white&style=flat-square]]
-[[https://img.shields.io/github/license/Bowuigi/Vex?color=green&label=License&logo=gnu&logoColor=black&style=flat-square]]
+[[https://img.shields.io/tokei/lines/github/Bowuigi/Vex.svg?color=blue&label=Lines%20of%20Code&logo=C&logoColor=white&style=flat-square]]
+
+[[https://img.shields.io/github/license/Bowuigi/Vex.svg?color=green&label=License&logo=gnu&logoColor=black&style=flat-square]]
 
 * Installation
 +Clone it by doing git clone https://github.com/Bowuigi/Vex+ Download the latest working commit: =curl https://github.com/Bowuigi/Vex/archive/9d3981704023024863dd314aa0c9ef93fa6b3ead.zip > Vex.zip=
