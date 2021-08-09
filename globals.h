@@ -14,7 +14,9 @@ typedef struct {
 } state;
 
 struct key {
-	uint32_t keycode;
+	uint32_t mod;
+	uint32_t special;
+	uint32_t key;
 	void (*trigger)(state *s);
 };
 

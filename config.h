@@ -42,12 +42,20 @@ const char *file_prefix = "";
 const char *file_suffix = "";
 
 struct key keys[] = {
-	{.keycode='f', .trigger=find_mode},
-	{.keycode='w', .trigger=create_window},
-	{.keycode='x', .trigger=delete_window},
-	{.keycode='k', .trigger=cursor_up},
-	{.keycode='j', .trigger=cursor_down},
-	{.keycode=' ', .trigger=next_window}
+	// Modes
+	{.mod=0           , .special=0                , .key='f', .trigger=find_mode     },
+	{.mod=0           , .special=TB_KEY_ESC       , .key=0  , .trigger=normal_mode   },
+	// Window management
+	{.mod=0           , .special=0                , .key='w', .trigger=create_window },
+	{.mod=0           , .special=0                , .key='x', .trigger=delete_window },
+	{.mod=0           , .special=0                , .key=' ', .trigger=next_window   },
+	// Cursor
+	{.mod=0           , .special=0                , .key='k', .trigger=cursor_up     },
+	{.mod=0           , .special=0                , .key='j', .trigger=cursor_down   },
+	{.mod=0           , .special=TB_KEY_ARROW_UP  , .key=0  , .trigger=cursor_up     },
+	{.mod=0           , .special=TB_KEY_ARROW_DOWN, .key=0  , .trigger=cursor_down   },
+	// Other
+	{.mod=TB_META_ALT , .special=0                , .key='l', .trigger=create_window }
 };
 
 const size_t keys_length = sizeof(keys)/sizeof(keys[0]);

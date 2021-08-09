@@ -4,6 +4,10 @@ void find_mode(state *s) {
 	s->mode='f';
 }
 
+void normal_mode(state *s) {
+	s->mode='n';
+}
+
 void create_window(state *s) {
 	if (s->windows<s->h/5) {
 		tb_clear_buffer();
@@ -34,4 +38,11 @@ void next_window(state *s) {
 
 	if (s->cursor_window>=s->windows)
 		s->cursor_window=0;
+}
+
+void clear_screen(state *s) {
+	tb_clear_screen();
+	tb_clear_buffer();
+	s->w=tb_width();
+	s->h=tb_height();
 }

@@ -96,13 +96,13 @@ int main(void) {
 
 			size_t k=0;
 			for (k=0;k<keys_length;k++) {
-				if (ev.ch==keys[k].keycode) {
+				if (ev.meta== keys[k].mod      &&
+				    ev.key == keys[k].special  &&
+				    ev.ch  == keys[k].key
+				    ) {
 					keys[k].trigger(&s);
 				}
 			}
-
-			if (ev.key==TB_KEY_ESC)
-				s.mode='n';
 		}
 
 		draw(s.w,s.h);
